@@ -13,128 +13,140 @@ body{
   margin:0;
   background:#0b0d11;
   color:#fff;
-  font-family:-apple-system,BlinkMacSystemFont,"PingFang TC",
-  "Microsoft JhengHei",sans-serif;
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Microsoft JhengHei",sans-serif;
 }
 
 .app{
   max-width:520px;
   margin:auto;
-  padding:32px 20px 50px;
+  padding:30px 18px 50px;
 }
 
 .brand{
-  font-size:14px;
+  font-size:13px;
   letter-spacing:4px;
-  color:#c8a866;
+  color:#c7a96d;
   margin-bottom:8px;
 }
 
 h1{
-  margin:0 0 8px;
-  font-size:30px;
+  margin:0;
+  font-size:31px;
+  font-weight:800;
 }
 
-.description{
-  color:#8e96a3;
-  line-height:1.7;
+.desc{
+  color:#969eaa;
   font-size:14px;
-  margin-bottom:30px;
+  line-height:1.8;
+  margin:12px 0 26px;
 }
 
 .panel{
   background:#151920;
-  border:1px solid #292f39;
+  border:1px solid #2d3440;
   border-radius:24px;
-  padding:20px;
+  padding:18px;
 }
 
 label{
   display:block;
   color:#aeb5bf;
   font-size:14px;
-  margin-bottom:9px;
+  margin-bottom:8px;
 }
 
 input{
   width:100%;
   height:58px;
-  background:#0d1015;
-  border:1px solid #343b47;
-  border-radius:16px;
+  background:#0e1116;
   color:#fff;
+  border:1px solid #343c48;
+  border-radius:16px;
   font-size:18px;
-  padding:0 16px;
-  margin-bottom:14px;
+  padding:0 15px;
+}
+
+button{
+  width:100%;
+  height:59px;
+  border-radius:17px;
+  border:0;
+  font-size:18px;
+  font-weight:800;
+  margin-top:14px;
 }
 
 .generate{
-  width:100%;
-  height:60px;
-  border:0;
-  border-radius:17px;
-  background:linear-gradient(135deg,#f0dda7,#b38b48);
+  background:linear-gradient(135deg,#f0dda8,#b78c48);
   color:#15110a;
-  font-size:18px;
-  font-weight:800;
 }
 
 .generate:disabled{
   opacity:.55;
 }
 
+.download{
+  display:none;
+  background:#242a33;
+  color:white;
+  border:1px solid #353d48;
+}
+
 .status{
-  text-align:center;
   min-height:24px;
-  margin:18px 0;
-  color:#a8b0bb;
+  text-align:center;
+  color:#aab2bd;
   font-size:14px;
+  margin:18px 0;
 }
 
 .preview{
   width:100%;
-  aspect-ratio:4/5;
+  aspect-ratio:2/3;
+  background:#090b0e;
   border-radius:20px;
   overflow:hidden;
-  background:#090b0e;
   display:flex;
   align-items:center;
   justify-content:center;
-  position:relative;
 }
 
 .placeholder{
-  color:#59616c;
   text-align:center;
+  color:#58616d;
+  font-size:14px;
   line-height:1.8;
 }
 
 #result{
   width:100%;
   height:100%;
-  object-fit:cover;
+  object-fit:contain;
   display:none;
+  background:#090b0e;
 }
 
-.download{
-  display:none;
-  width:100%;
-  margin-top:14px;
-  height:55px;
-  border:1px solid #343b47;
-  border-radius:16px;
-  background:#232832;
-  color:#fff;
-  font-size:17px;
-  font-weight:700;
-}
-
-.note{
-  color:#656e79;
+.footer{
   text-align:center;
+  color:#616975;
   font-size:12px;
   margin-top:18px;
-  line-height:1.6;
+  line-height:1.7;
+}
+
+.loader{
+  display:none;
+  width:34px;
+  height:34px;
+  border:3px solid #333944;
+  border-top-color:#d8bd82;
+  border-radius:50%;
+  animation:spin 1s linear infinite;
+}
+
+@keyframes spin{
+  to{transform:rotate(360deg)}
 }
 </style>
 </head>
@@ -147,9 +159,9 @@ input{
 
   <h1>每日早安圖</h1>
 
-  <div class="description">
-    輸入日期，其餘交給 AI。<br>
-    每次重新創作文字、場景、構圖與整體視覺。
+  <div class="desc">
+    只輸入日期。<br>
+    AI 自動生成全新文字、場景、構圖、色系與完整海報。
   </div>
 
   <div class="panel">
@@ -157,21 +169,21 @@ input{
     <label>早安圖日期</label>
 
     <input
-      type="date"
       id="date"
+      type="date"
     >
 
     <button
+      id="generateBtn"
       class="generate"
-      id="generate"
       onclick="generatePoster()"
     >
       一鍵 AI 生成
     </button>
 
     <div
-      class="status"
       id="status"
+      class="status"
     >
       準備生成今天的作品
     </div>
@@ -179,32 +191,39 @@ input{
     <div class="preview">
 
       <div
-        class="placeholder"
         id="placeholder"
+        class="placeholder"
       >
-        YOUR MORNING<br>
-        YOUR STORY
+        <div
+          id="loader"
+          class="loader"
+        ></div>
+
+        <div id="placeholderText">
+          YOUR MORNING<br>
+          YOUR STORY
+        </div>
       </div>
 
       <img
         id="result"
-        alt="每日早安圖"
+        alt="曜衡每日早安圖"
       >
 
     </div>
 
     <button
+      id="downloadBtn"
       class="download"
-      id="download"
-      onclick="saveImage()"
+      onclick="downloadImage()"
     >
-      儲存早安圖
+      儲存圖片
     </button>
 
   </div>
 
-  <div class="note">
-    每一天，都應該是一張全新的作品。<br>
+  <div class="footer">
+    每一次生成，都是重新創作。<br>
     曜衡
   </div>
 
@@ -212,149 +231,248 @@ input{
 
 <script>
 
-const dateInput =
-document.getElementById("date");
+const dateInput = document.getElementById("date");
 
-const now = new Date();
+const today = new Date();
 
 dateInput.value =
-now.getFullYear()
-+"-"+
-String(now.getMonth()+1).padStart(2,"0")
-+"-"+
-String(now.getDate()).padStart(2,"0");
+  today.getFullYear() + "-" +
+  String(today.getMonth()+1).padStart(2,"0") + "-" +
+  String(today.getDate()).padStart(2,"0");
 
 
 async function generatePoster(){
 
-  const date =
-  dateInput.value;
+  const date = dateInput.value;
+
+  const button =
+    document.getElementById("generateBtn");
+
+  const status =
+    document.getElementById("status");
+
+  const image =
+    document.getElementById("result");
+
+  const placeholder =
+    document.getElementById("placeholder");
+
+  const placeholderText =
+    document.getElementById("placeholderText");
+
+  const loader =
+    document.getElementById("loader");
+
+  const downloadBtn =
+    document.getElementById("downloadBtn");
+
 
   if(!date){
     alert("請先選擇日期");
     return;
   }
 
-  const button =
-  document.getElementById("generate");
-
-  const status =
-  document.getElementById("status");
 
   button.disabled = true;
 
   button.innerText =
-  "AI 創作中...";
+    "AI 正在創作...";
 
   status.innerText =
-  "正在構思今天完全不同的早安圖...";
+    "正在生成全新的文字、場景與海報，請稍候...";
+
+  image.style.display =
+    "none";
+
+  downloadBtn.style.display =
+    "none";
+
+  placeholder.style.display =
+    "flex";
+
+  placeholder.style.flexDirection =
+    "column";
+
+  placeholder.style.alignItems =
+    "center";
+
+  placeholder.style.gap =
+    "18px";
+
+  loader.style.display =
+    "block";
+
+  placeholderText.innerHTML =
+    "AI DESIGNING<br>PLEASE WAIT";
+
 
   try{
 
     const response =
-    await fetch("/api/generate",{
+      await fetch("/api/generate",{
 
-      method:"POST",
+        method:"POST",
 
-      headers:{
-        "Content-Type":"application/json"
-      },
+        headers:{
+          "Content-Type":"application/json"
+        },
 
-      body:JSON.stringify({
-        date:date
-      })
+        body:JSON.stringify({
+          date:date,
+          nonce:Date.now()
+        })
 
-    });
+      });
 
-    const data =
-    await response.json();
 
-    if(!response.ok){
+    let data;
+
+    try{
+      data = await response.json();
+    }
+    catch{
       throw new Error(
-        data.error || "生成失敗"
+        "伺服器回傳格式錯誤"
       );
     }
 
-    const image =
-    document.getElementById("result");
+
+    if(!response.ok){
+
+      throw new Error(
+        data.error ||
+        "AI 生成失敗"
+      );
+
+    }
+
+
+    if(!data.image){
+
+      throw new Error(
+        "沒有收到圖片"
+      );
+
+    }
+
+
+    image.onload = function(){
+
+      placeholder.style.display =
+        "none";
+
+      loader.style.display =
+        "none";
+
+      image.style.display =
+        "block";
+
+      downloadBtn.style.display =
+        "block";
+
+      status.innerText =
+        "完成。這是一張全新的 AI 早安圖。";
+
+    };
+
 
     image.src =
-    data.image;
+      data.image;
 
-    image.style.display =
-    "block";
-
-    document.getElementById(
-      "placeholder"
-    ).style.display="none";
-
-    document.getElementById(
-      "download"
-    ).style.display="block";
-
-    status.innerText =
-    "今日早安圖完成";
 
   }
-
   catch(error){
 
     console.error(error);
 
+    loader.style.display =
+      "none";
+
+    placeholderText.innerHTML =
+      "生成失敗";
+
     status.innerText =
-    "AI 尚未連接，下一步設定生成系統";
+      "錯誤：" + error.message;
 
   }
-
   finally{
 
-    button.disabled=false;
+    button.disabled =
+      false;
 
-    button.innerText=
-    "重新生成另一版";
+    button.innerText =
+      "重新生成另一版";
 
   }
 
 }
 
 
-async function saveImage(){
+async function downloadImage(){
 
   const image =
-  document.getElementById("result");
+    document.getElementById("result");
 
   if(!image.src){
     return;
   }
 
+
   try{
 
+    if(
+      image.src.startsWith(
+        "data:image"
+      )
+    ){
+
+      const link =
+        document.createElement("a");
+
+      link.href =
+        image.src;
+
+      link.download =
+        "曜衡早安圖-" +
+        dateInput.value +
+        ".png";
+
+      document.body.appendChild(link);
+
+      link.click();
+
+      link.remove();
+
+      return;
+    }
+
+
     const response =
-    await fetch(image.src);
+      await fetch(image.src);
 
     const blob =
-    await response.blob();
+      await response.blob();
 
     const url =
-    URL.createObjectURL(blob);
+      URL.createObjectURL(blob);
 
     const link =
-    document.createElement("a");
+      document.createElement("a");
 
-    link.href=url;
+    link.href =
+      url;
 
-    link.download=
-    "曜衡早安圖-"+
-    dateInput.value+
-    ".png";
+    link.download =
+      "曜衡早安圖-" +
+      dateInput.value +
+      ".png";
 
     link.click();
 
     URL.revokeObjectURL(url);
 
   }
-
-  catch(e){
+  catch(error){
 
     window.open(
       image.src,
